@@ -1,0 +1,25 @@
+endpoint:
+  path:
+    base: "/api"
+    external: "${endpoint.path.base}/external"
+    open: "${endpoint.path.external}/open"
+    verification: "${endpoint.path.external}/verification/"
+    verify: "verify"
+
+allowed:
+  origins:
+    "http://localhost:5173 , http://localhost:6969"
+  endpoints: "/api/external/**"
+  paths: "/api/external/auth/**, 
+          /api/external/verification/**,                
+          /error, /api/external/open/**,
+          /swagger-ui/**,
+          /swagger-resources/**,
+          /webjars/**,
+          /v3/**"
+
+
+
+
+
+
