@@ -5,16 +5,14 @@ plugins {
     id 'application'
     id 'java-library'
     id 'maven-publish'
-    id "nebula.release" version "17.2.1"
     id 'io.freefair.lombok' version '8.6'
-    id 'org.springframework.boot' version '3.3.2'
-    id 'com.google.cloud.tools.jib' version '3.3.1'
-    id "com.netflix.nebula.ospackage" version "11.4.0"
+    id 'org.springframework.boot' version '3.5.4'
+    id "com.google.cloud.tools.jib" version "3.4.4"
+    id "com.netflix.nebula.release" version "21.0.0"
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
-group = 'iam.mfa'
-version = '0.0.1-SNAPSHOT'
+group = 'dev.mfataka'
 
 java {
     toolchain {
@@ -26,6 +24,23 @@ repositories {
     mavenCentral()
 }
 
+
+afterEvaluate {
+    jib {
+        from {
+            image = 'registry.access.redhat.com/ubi8/openjdk-21-runtime:1.23-3'
+        }
+        to {
+
+
+            image = "ghcr.io/hammafataka/" + project.rootProject.name
+            auth {
+                username = System.getenv().getOrDefault("GITHUB_ACTOR", "")
+                password = System.getenv().getOrDefault("GITHUB_TOKEN", "")
+            }
+        }
+    }
+}
 dependencies {
     // spring
     implementation 'org.springframework.boot:spring-boot-starter-cache'
@@ -76,6 +91,58 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            version = project.version
+            artifactId = project.name
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'ESN web backend'
+                description = 'backend project for esn web'
+                inceptionYear.set("2025")
+                organization {
+                    name.set("Mfataka")
+                    url.set("https://mfataka.dev/")
+                }
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven({  ->
+            def evn = System.getenv()
+
+            def repo = System.getenv('GITHUB_REPOSITORY') ?: 'hammafataka/esn_web_backend'
+            def parts = repo.split('/')
+            def owner = parts[0]
+            def name  = parts[1]
+            url = uri("https://maven.pkg.github.com/${owner}/${name}")
+
+
+            credentials {
+                username = evn.getOrDefault("GITHUB_ACTOR", "")
+                password = evn.getOrDefault("GITHUB_TOKEN", "")
+            }
+        })
+    }
+}
+
 
 tasks.named('test') {
     useJUnitPlatform()
