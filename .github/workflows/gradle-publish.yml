@@ -5,8 +5,7 @@ on:
     types: [created]
 
 jobs:
-  build:
-
+  publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,12 +24,9 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
 
-    - name: Build with Gradle
-      run: ./gradlew build
-
-
     - name: Publish to GitHub Packages
-      run: ./gradlew publish
+      run: ./gradlew -Pversion=${{ github.event.release.tag_name }} build publish
       env:
         USERNAME: ${{ github.actor }}
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
