@@ -125,13 +125,13 @@ publishing {
         }
     }
     repositories {
-        maven({  ->
+        maven({ ->
             def evn = System.getenv()
 
             def repo = System.getenv('GITHUB_REPOSITORY') ?: 'hammafataka/esn_web_backend'
             def parts = repo.split('/')
             def owner = parts[0]
-            def name  = parts[1]
+            def name = parts[1]
             url = uri("https://maven.pkg.github.com/${owner}/${name}")
 
 
