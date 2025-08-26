@@ -35,8 +35,8 @@ afterEvaluate {
 
             image = "ghcr.io/hammafataka/" + project.rootProject.name
             auth {
-                username = System.getenv().getOrDefault("USERNAME", "")
-                password = System.getenv().getOrDefault("TOKEN", "")
+                username = System.getenv().getOrDefault("GITHUB_ACTOR", "")
+                password = System.getenv().getOrDefault("GITHUB_TOKEN", "")
             }
         }
     }
@@ -136,8 +136,8 @@ publishing {
 
 
             credentials {
-                username = evn.getOrDefault("USERNAME", "")
-                password = evn.getOrDefault("TOKEN", "")
+                username = evn.getOrDefault("GITHUB_ACTOR", "")
+                password = evn.getOrDefault("GITHUB_TOKEN", "")
             }
         })
     }
