@@ -25,7 +25,7 @@ jobs:
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
 
     - name: Publish to GitHub Packages
-      run: ./gradlew -Pversion=${{ github.event.release.tag_name }} build publish
+      run: ./gradlew -Prelease.useLastTag=true -Pversion=${{ github.event.release.tag_name }} build publish final
       env:
         USERNAME: ${{ github.actor }}
         TOKEN: ${{ secrets.GITHUB_TOKEN }}
