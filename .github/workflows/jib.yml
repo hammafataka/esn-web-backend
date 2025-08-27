@@ -1,6 +1,7 @@
 name: Build & Push Image (Jib)
 
 on:
+  workflow_dispatch: { }
   push:
     branches: [ "main" ]
   pull_request:
@@ -11,7 +12,7 @@ jobs:
   jib-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -20,22 +21,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Resolve VERSION
-        id: ver
-        shell: bash
+      - name: Configure git identity
         run: |
-          # Priority: manual input > release tag > latest git tag
-          if [ -n "${{ github.event.inputs.version }}" ]; then
-            V="${{ github.event.inputs.version }}"
-          elif [ "${{ github.event.release.tag_name }}" != "" ]; then
-            V="${{ github.event.release.tag_name }}"
-          else
-            V="$(git describe --tags --abbrev=0 || echo 0.0.0)"
-          fi
-          # drop common leading 'v'
-          V="${V#v}"
-          echo "version=$V" >> "$GITHUB_OUTPUT"
-          echo "Resolved VERSION=$V"
+          git config user.name  "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -44,15 +33,14 @@ jobs:
           java-version: '21'
           cache: gradle
 
-
       - name: Auth check to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      - name: Build & push image with Jib
-        run: ./gradlew --no-daemon jib --info
+      - name: Build & push image (Nebula snapshot → Jib)
+        run: |
+          # Set version to next -SNAPSHOT via Nebula, then push image
+          ./gradlew --no-daemon snapshot jib --info
         env:
-          # Jib/Gradle will use these
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          VERSION: ${{ steps.ver.outputs.version }}

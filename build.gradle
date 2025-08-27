@@ -40,7 +40,8 @@ jib {
             username = System.getenv().getOrDefault("GITHUB_ACTOR", "")
             password = System.getenv().getOrDefault("GITHUB_TOKEN", "")
         }
-        tags = ["latest", project.version.toString()]
+        def formattedVersion= project.version.toString().replace("+", "_")
+        tags = ["latest", formattedVersion]
     }
 }
 
