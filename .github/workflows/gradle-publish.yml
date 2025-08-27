@@ -33,7 +33,7 @@ jobs:
           java-version: '21'
           cache: gradle
       - name: Release + Publish
-        run: ./gradlew --no-daemon clean final publish -Prelease.scope=${{ github.event.inputs.scope }}
+        run: ./gradlew --no-daemon -Prelease.scope=${{ github.event.inputs.scope }} clean final publish jib
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}

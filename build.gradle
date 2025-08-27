@@ -25,22 +25,22 @@ repositories {
 }
 
 
-afterEvaluate {
-    jib {
-        from {
-            image = 'registry.access.redhat.com/ubi8/openjdk-21-runtime:1.23-3'
-        }
-        to {
+jib {
+    from {
+        image = 'registry.access.redhat.com/ubi8/openjdk-21-runtime:1.23-3'
+    }
+    to {
 
 
-            image = "ghcr.io/hammafataka/" + project.rootProject.name
-            auth {
-                username = System.getenv().getOrDefault("GITHUB_ACTOR", "")
-                password = System.getenv().getOrDefault("GITHUB_TOKEN", "")
-            }
+        image = "ghcr.io/hammafataka/" + project.rootProject.name
+        auth {
+            username = System.getenv().getOrDefault("GITHUB_ACTOR", "")
+            password = System.getenv().getOrDefault("GITHUB_TOKEN", "")
         }
+        tags = ["latest", project.version.toString()]
     }
 }
+
 dependencies {
     // spring
     implementation 'org.springframework.boot:spring-boot-starter-cache'
