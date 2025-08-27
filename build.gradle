@@ -157,8 +157,14 @@ jib {
         image = "ghcr.io/${owner}/${repo}"
 
         auth {
-            username = System.getenv("GITHUB_ACTOR") ?: ''
-            password = System.getenv("GITHUB_TOKEN") ?: ''
+            def getenv = System.getenv("GITHUB_ACTOR")
+            println("actor is ${getenv}")
+            username = getenv ?: ''
+
+            def getenv1 = System.getenv("GITHUB_TOKEN")
+            println("token is ${getenv1}")
+
+            password = getenv1 ?: ''
         }
         def formattedVersion = project.version.toString().replace("+", "_")
         tags = ["latest", formattedVersion]
