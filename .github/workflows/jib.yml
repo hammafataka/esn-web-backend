@@ -11,9 +11,7 @@ on:
 jobs:
   jib-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
+    permissions: write-all
 
     steps:
       - name: Checkout (full history for tags)
@@ -39,7 +37,7 @@ jobs:
       - name: Build & push image (Nebula snapshot → Jib)
         run: |
           # Set version to next -SNAPSHOT via Nebula, then push image
-          ./gradlew --no-daemon snapshot jib --info
+          ./gradlew --no-daemon snapshot jib
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
