@@ -1,36 +1,32 @@
 name: Publish gradle to packages
 
 on:
-  workflow_dispatch: { }
+  release:
+    types: [created]
 
 jobs:
-  release-and-publish:
+  publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
+
     steps:
-      - name: Checkout (full history)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: true
+    - uses: actions/checkout@v4
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        server-id: github
+        settings-path: ${{ github.workspace }}
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: gradle
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582
 
-      - name: Configure git identity
-        run: |
-          git config user.name  "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-
-      - name: Release (create tag) & Publish
-        run: ./gradlew --no-daemon clean final publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+    - name: Publish to GitHub Packages
+      run: ./gradlew -Prelease.useLastTag=true -Pversion=${{ github.event.release.tag_name }} build publish final
+      env:
+        USERNAME: ${{ github.actor }}
+        TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
