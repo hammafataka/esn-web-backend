@@ -1,0 +1,58 @@
+name: Build & Push Image (Jib)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+
+jobs:
+  jib-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout (full history for tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve VERSION
+        id: ver
+        shell: bash
+        run: |
+          # Priority: manual input > release tag > latest git tag
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            V="${{ github.event.inputs.version }}"
+          elif [ "${{ github.event.release.tag_name }}" != "" ]; then
+            V="${{ github.event.release.tag_name }}"
+          else
+            V="$(git describe --tags --abbrev=0 || echo 0.0.0)"
+          fi
+          # drop common leading 'v'
+          V="${V#v}"
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "Resolved VERSION=$V"
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+
+      - name: Auth check to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build & push image with Jib
+        run: ./gradlew --no-daemon jib --info
+        env:
+          # Jib/Gradle will use these
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          VERSION: ${{ steps.ver.outputs.version }}
