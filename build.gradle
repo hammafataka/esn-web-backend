@@ -32,7 +32,10 @@ jib {
     to {
 
 
-        image = "ghcr.io/hammafataka/" + project.rootProject.name
+        def repoEnv = System.getenv('GITHUB_REPOSITORY') // e.g. "hammafataka/esn-web-backend"
+        def (owner, repo) = (repoEnv ?: 'hammafataka/esn-web-backend').toLowerCase().split('/')
+        image = "ghcr.io/hammafataka/${owner}/${repo}"
+
         auth {
             username = System.getenv().getOrDefault("GITHUB_ACTOR", "")
             password = System.getenv().getOrDefault("GITHUB_TOKEN", "")
@@ -128,11 +131,9 @@ publishing {
         maven({ ->
             def evn = System.getenv()
 
-            def repo = System.getenv('GITHUB_REPOSITORY') ?: 'hammafataka/esn_web_backend'
-            def parts = repo.split('/')
-            def owner = parts[0]
-            def name = parts[1]
-            url = uri("https://maven.pkg.github.com/${owner}/${name}")
+            def repoEnv = System.getenv('GITHUB_REPOSITORY') // e.g. "hammafataka/esn-web-backend"
+            def (owner, repo) = (repoEnv ?: 'hammafataka/esn-web-backend').toLowerCase().split('/')
+            url = uri("https://maven.pkg.github.com/${owner}/${repo}")
 
 
             credentials {
