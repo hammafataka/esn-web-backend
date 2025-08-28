@@ -154,7 +154,7 @@ jib {
 
 
         def repoEnv = System.getenv('GITHUB_REPOSITORY')
-        image = "ghcr.io/${repoEnv}"
+        image = "ghcr.io/hammafataka/esn-web-backend"
 
         auth {
             username = System.getenv().getOrDefault("GITHUB_ACTOR", "")
