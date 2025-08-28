@@ -31,13 +31,10 @@ jobs:
           java-version: '21'
           cache: gradle
 
-      - name: Auth check to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-
       - name: Build & push image (Nebula snapshot → Jib)
         run: |
           # Set version to next -SNAPSHOT via Nebula, then push image
-          ./gradlew --no-daemon snapshot jib --info
+          ./gradlew --no-daemon snapshot jib 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
