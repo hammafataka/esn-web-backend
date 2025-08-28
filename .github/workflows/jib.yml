@@ -11,7 +11,9 @@ on:
 jobs:
   jib-push:
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout (full history for tags)
@@ -31,9 +33,15 @@ jobs:
           java-version: '21'
           cache: gradle
 
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+            registry: ${{ env.REGISTRY }}
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build & push image (Nebula snapshot → Jib)
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
           ./gradlew --no-daemon snapshot jib
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
