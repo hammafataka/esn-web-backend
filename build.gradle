@@ -8,7 +8,7 @@ plugins {
     id 'maven-publish'
     id 'io.freefair.lombok' version '8.6'
     id 'org.springframework.boot' version '3.5.4'
-    id "com.google.cloud.tools.jib" version "3.4.4"
+    id "com.google.cloud.tools.jib" version "3.4.5"
     id "com.netflix.nebula.release" version "21.0.0"
     id 'io.spring.dependency-management' version '1.1.6'
     id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
@@ -150,6 +150,7 @@ jib {
         image = 'registry.access.redhat.com/ubi8/openjdk-21-runtime:1.23-3'
     }
     to {
+
 
 
         def repoEnv = System.getenv('GITHUB_REPOSITORY')
