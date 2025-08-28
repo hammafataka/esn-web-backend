@@ -44,7 +44,7 @@ jobs:
 
       - name: Build & push image (Nebula snapshot → Jib)
         run: |
-          ./gradlew --no-daemon snapshot jib
+          ./gradlew --no-daemon jib
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
