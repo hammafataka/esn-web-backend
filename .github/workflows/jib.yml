@@ -36,6 +36,6 @@ jobs:
         run: |
           ./gradlew --no-daemon jib snapshot
         env:
-          GHRC_TOKEN: ${{ secrets.GHRC_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_REPOSITORY: ${{ github.repository }}
