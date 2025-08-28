@@ -156,6 +156,10 @@ jib {
         def (owner, repo) = (repoEnv ?: 'hammafataka/esn-web-backend').toLowerCase().split('/')
         image = "ghcr.io/${owner}/${repo}"
 
+        auth {
+            username = System.getenv("GITHUB_ACTOR") ?: ''
+            password = System.getenv("GITHUB_TOKEN") ?: ''
+        }
         def formattedVersion = project.version.toString().replace("+", "_")
         tags = ["latest", formattedVersion]
     }
